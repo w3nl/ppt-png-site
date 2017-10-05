@@ -4,7 +4,7 @@
   "description": "site to convert ppt to png",
   "main": "server/index.js",
   "files": [
-      "server/index.js"
+    "server/index.js"
   ],
   "scripts": {
     "start": "node server/index.js",
@@ -15,8 +15,8 @@
     "url": "git+https://github.com/w3nl/ppt-png-site.git"
   },
   "author": {
-      "name": "Pieter Wigboldus",
-      "url": "https://hckr.news/"
+    "name": "Pieter Wigboldus",
+    "url": "https://hckr.news/"
   },
   "license": "GPL-3.0",
   "bugs": {
