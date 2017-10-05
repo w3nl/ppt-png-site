@@ -1,0 +1,35 @@
+{
+  "name": "ppt-png-site",
+  "version": "1.0.0",
+  "description": "site to convert ppt to png",
+  "main": "server/index.js",
+  "files": [
+      "server/index.js"
+  ],
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/w3nl/ppt-png-site.git"
+  },
+  "author": {
+      "name": "Pieter Wigboldus",
+      "url": "https://hckr.news/"
+  },
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/w3nl/ppt-png-site/issues"
+  },
+  "homepage": "https://github.com/w3nl/ppt-png-site#readme",
+  "dependencies": {
+    "array-helpers": "^1.0.1",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.1",
+    "express-fileupload": "^0.2.0",
+    "glob": "^7.1.2",
+    "multer": "^1.3.0",
+    "ppt-png": "^0.1.7"
+  }
+}
