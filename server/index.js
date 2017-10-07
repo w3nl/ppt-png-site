@@ -4,6 +4,10 @@ const multer = require('multer');
 const app = express();
 var Converter = require('ppt-png');
 
+var http = require('http');
+var server = http.createServer(app).listen(3001);
+var io = require('socket.io').listen(server);
+
 var storage = multer.diskStorage({
     destination: function(req, file, callback) {
         callback(null, './upload');
@@ -21,6 +25,15 @@ require('array-helpers');
 
 app.use(bodyParser.json());
 
+
+io.on('connection', function(socket) {
+    socket.emit('news', {
+        hello: 'world'
+    });
+    socket.on('my other event', function(data) {
+        console.log(data);
+    });
+});
 
 app.post('/upload', function(req, res) {
     upload(req, res, function(err) {
@@ -43,11 +56,12 @@ app.post('/upload', function(req, res) {
 
         process(req.files, invert, greyscale);
 
-        res.end('File is uploaded');
+        res.end('<result>File is uploaded</result>');
     });
 });
 
 app.use(express.static('public'));
+app.use('/converted', express.static('converted'));
 
 app.listen(3000, function() {
     console.log('Example app listening on port 3000!');
@@ -76,6 +90,12 @@ function process(files, invert, greyscale) {
             fileNameFormat: '_vers_%d'
         }).wait().then(function(data) {
             console.log(data.failed, data.success.length, data.files.length, data.time);
+            io.emit('news', {
+                failed:  data.failed,
+                success: data.success,
+                files:   data.files,
+                time:    data.time
+            });
         });
     }
 }
