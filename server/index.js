@@ -4,11 +4,6 @@ const multer = require('multer');
 const app = express();
 var Converter = require('ppt-png');
 
-require('array-helpers');
-
-app.use(bodyParser.json());
-
-
 var storage = multer.diskStorage({
     destination: function(req, file, callback) {
         callback(null, './upload');
@@ -21,6 +16,10 @@ var storage = multer.diskStorage({
 var upload = multer({
     storage: storage
 }).array('ppt', 2);
+
+require('array-helpers');
+
+app.use(bodyParser.json());
 
 
 app.post('/upload', function(req, res) {
@@ -77,9 +76,6 @@ function process(files, invert, greyscale) {
             fileNameFormat: '_vers_%d'
         }).wait().then(function(data) {
             console.log(data.failed, data.success.length, data.files.length, data.time);
-            if(data.failed.length > 0) {
-                convert(null, data.failed.multikey('file'));
-            }
         });
     }
 }
