@@ -2,14 +2,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const app = express();
-var Converter = require('ppt-png');
 
-var http = require('http');
-var server = http.createServer(app).listen(3001);
-var io = require('socket.io').listen(server);
-var filessystem = require('fs');
+const Ppt = require('./ppt.js');
+const Websocket = require('./websocket.js');
 
-var storage = multer.diskStorage({
+const storage = multer.diskStorage({
     destination: function(req, file, callback) {
         callback(null, './upload');
     },
@@ -18,26 +15,18 @@ var storage = multer.diskStorage({
     }
 });
 
-var upload = multer({
+const upload = multer({
     storage: storage
 }).array('ppt', 2);
 
-let uploads = 0;
+const httpPort = 3000;
+const socketPort = 3001;
 
-require('array-helpers');
+let uploads = 0;
+const io = new Websocket(app, socketPort, uploads);
+const pptpng = new Ppt(io, uploads);
 
 app.use(bodyParser.json());
-
-
-io.on('connection', function(socket) {
-    socket.emit('uploaded', {
-        failed:  [],
-        success: [],
-        files:   [],
-        time:    0,
-        uploads: uploads
-    });
-});
 
 app.post('/upload', function(req, res) {
     upload(req, res, function(err) {
@@ -58,7 +47,7 @@ app.post('/upload', function(req, res) {
             greyscale = req.body.greyscale || false;
         }
 
-        process(req.files, invert, greyscale);
+        pptpng.process(req.files, invert, greyscale);
 
         res.end('<result>File is uploaded</result>');
     });
@@ -69,45 +58,6 @@ app.post('/upload', function(req, res) {
 app.use(express.static('public'));
 app.use('/converted', express.static('converted'));
 
-app.listen(3000, function() {
-    console.log('Example app listening on port 3000!');
+app.listen(httpPort, function() {
+    console.log('Example app listening on port ' + httpPort + '!');
 });
-
-/**
- * Process the ppt.
- *
- * @param {array} files
- * @param {boolean} invert
- * @param {boolean} greyscale
- */
-function process(files, invert, greyscale) {
-    var outputDirectory = 'converted/' + uploads + '/';
-
-    console.log('invert:' + invert + '|greyscale:' + greyscale);
-
-    console.log('files: ', files.length);
-    if(files) {
-        if (!filessystem.existsSync(outputDirectory)) {
-            filessystem.mkdirSync(outputDirectory);
-        }
-
-        new Converter({
-            files:          files,
-            output:         outputDirectory,
-            invert:         invert || false,
-            greyscale:      greyscale || false,
-            deletePdfFile:  true,
-            outputType:     'png',
-            logLevel:       2,
-            fileNameFormat: '_vers_%d'
-        }).wait().then(function(data) {
-            console.log(data.failed, data.success.length, data.files.length, data.time);
-            io.emit('uploaded', {
-                failed:  data.failed,
-                success: data.success,
-                files:   data.files,
-                time:    data.time
-            });
-        });
-    }
-}

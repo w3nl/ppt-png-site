@@ -37,7 +37,7 @@ array-flatten@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/array-flatten/-/array-flatten-1.1.1.tgz#9a5f699051b1e7073328f2a008968b64ea2955d2"
 
-array-helpers@1.0.x, array-helpers@^1.0.1:
+array-helpers@1.0.x:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/array-helpers/-/array-helpers-1.0.1.tgz#87c044a3c22ff95d963ae2f2e4cffe7b3bd13524"
 

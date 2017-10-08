@@ -24,11 +24,13 @@
   },
   "homepage": "https://github.com/w3nl/ppt-png-site#readme",
   "dependencies": {
-    "array-helpers": "^1.0.1",
     "body-parser": "^1.18.2",
     "express": "^4.16.1",
     "multer": "^1.3.0",
     "ppt-png": "^0.1.8",
     "socket.io": "^2.0.3"
+  },
+  "engines": {
+    "node": ">= 6.0"
   }
 }
