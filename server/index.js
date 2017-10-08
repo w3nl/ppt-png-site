@@ -7,6 +7,7 @@ var Converter = require('ppt-png');
 var http = require('http');
 var server = http.createServer(app).listen(3001);
 var io = require('socket.io').listen(server);
+var filessystem = require('fs');
 
 var storage = multer.diskStorage({
     destination: function(req, file, callback) {
@@ -21,17 +22,20 @@ var upload = multer({
     storage: storage
 }).array('ppt', 2);
 
+let uploads = 0;
+
 require('array-helpers');
 
 app.use(bodyParser.json());
 
 
 io.on('connection', function(socket) {
-    socket.emit('news', {
-        hello: 'world'
-    });
-    socket.on('my other event', function(data) {
-        console.log(data);
+    socket.emit('uploaded', {
+        failed:  [],
+        success: [],
+        files:   [],
+        time:    0,
+        uploads: uploads
     });
 });
 
@@ -58,6 +62,8 @@ app.post('/upload', function(req, res) {
 
         res.end('<result>File is uploaded</result>');
     });
+
+    uploads++;
 });
 
 app.use(express.static('public'));
@@ -75,13 +81,19 @@ app.listen(3000, function() {
  * @param {boolean} greyscale
  */
 function process(files, invert, greyscale) {
+    var outputDirectory = 'converted/' + uploads + '/';
+
     console.log('invert:' + invert + '|greyscale:' + greyscale);
 
     console.log('files: ', files.length);
     if(files) {
+        if (!filessystem.existsSync(outputDirectory)) {
+            filessystem.mkdirSync(outputDirectory);
+        }
+
         new Converter({
             files:          files,
-            output:         'converted/',
+            output:         outputDirectory,
             invert:         invert || false,
             greyscale:      greyscale || false,
             deletePdfFile:  true,
@@ -90,7 +102,7 @@ function process(files, invert, greyscale) {
             fileNameFormat: '_vers_%d'
         }).wait().then(function(data) {
             console.log(data.failed, data.success.length, data.files.length, data.time);
-            io.emit('news', {
+            io.emit('uploaded', {
                 failed:  data.failed,
                 success: data.success,
                 files:   data.files,

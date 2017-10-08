@@ -7,8 +7,7 @@
         "browser": true
     },
     "globals": {
-        "Modernizr": false,
-        "W2Form": false
+        "io": false
     },
     "rules": {
         "no-console": "warn",
