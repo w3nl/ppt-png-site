@@ -6,12 +6,14 @@ const app = express();
 const Ppt = require('./ppt.js');
 const Websocket = require('./websocket.js');
 
+let fileUploads = 0;
 const storage = multer.diskStorage({
     destination: function(req, file, callback) {
         callback(null, './upload');
     },
     filename: function(req, file, callback) {
-        callback(null, file.fieldname + '-' + Date.now());
+        callback(null, file.fieldname + '-' + fileUploads + '-' + Date.now());
+        fileUploads++;
     }
 });
 
@@ -24,7 +26,6 @@ const socketPort = 3001;
 
 let uploads = 0;
 const io = new Websocket(app, socketPort, uploads);
-const pptpng = new Ppt(io, uploads);
 
 app.use(bodyParser.json());
 
@@ -33,6 +34,8 @@ app.post('/upload', function(req, res) {
         if(err) {
             return res.end('Error uploading file.');
         }
+
+        const pptpng = new Ppt(io, uploads);
 
         let ppt = req.files;
         let invert = false;
@@ -49,7 +52,7 @@ app.post('/upload', function(req, res) {
 
         pptpng.process(req.files, invert, greyscale);
 
-        res.end('<result>File is uploaded</result>');
+        res.end('File is uploaded');
     });
 
     uploads++;

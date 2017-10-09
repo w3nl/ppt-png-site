@@ -9,7 +9,7 @@ class ppt {
      * Constructor.
      *
      * @param {object} io
-     * @param {int} uploads
+     * @param {int}    uploads
      */
     constructor(io, uploads) {
         this.io = io;
@@ -19,12 +19,17 @@ class ppt {
     /**
      * Process the ppt to png.
      *
-     * @param {array} files
+     * @param {array}   files
      * @param {boolean} invert
      * @param {boolean} greyscale
+     * @param {int}     uploads
      */
-    process(files, invert, greyscale) {
+    process(files, invert, greyscale, uploads) {
         const outputDirectory = 'converted/' + this.uploads + '/';
+
+        if(uploads) {
+            this.uploads = uploads;
+        }
 
         console.log('invert:' + invert + '|greyscale:' + greyscale);
         console.log('files: ', files.length);
@@ -54,7 +59,7 @@ class ppt {
      */
     update(data) {
         console.log(data.failed, data.success.length, data.files.length, data.time);
-        this.io.update(data);
+        this.io.update(data, this.uploads);
     }
 }
 

@@ -8,8 +8,8 @@ class Websocket {
      * Constructor.
      *
      * @param {object} app
-     * @param {int} port
-     * @param {int} uploads
+     * @param {int}    port
+     * @param {int}    uploads
      */
     constructor(app, port, uploads) {
         const server = http.createServer(app).listen(port);
@@ -40,13 +40,19 @@ class Websocket {
      * Send an update with the websocket.
      *
      * @param {object} data
+     * @param {int}    uploads
      */
-    update(data) {
+    update(data, uploads) {
+        if (uploads) {
+            this.uploads = uploads;
+        }
+
         this.io.emit('uploaded', {
             failed:  data.failed,
             success: data.success,
             files:   data.files,
-            time:    data.time
+            time:    data.time,
+            uploads: this.uploads
         });
     }
 }
