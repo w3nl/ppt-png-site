@@ -1,9 +1,24 @@
+<!doctype html>
+<title>Convert PPT to PNG</title>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+<link rel="stylesheet" href="/css/client.css">
 <h1>Convert PPT to PNG</h1>
-<form method="post" encType="multipart/form-data" action="/upload">
+<form
+    id="uploadForm"
+    encType="multipart/form-data"
+    action="/upload"
+    method="post"
+>
     invert <input name="invert" type="checkbox" value="1"><br>
     greyscale <input name="greyscale" type="checkbox" value="1"><br>
-    <input name="ppt" type="file">
+    <input name="ppt" type="file" multiple accept="application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation">
     <button type="submit">
         submit
     </button>
+    <span class="js-status"></span>
 </form>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+<script src="http://localhost:3001/socket.io/socket.io.js"></script>
+<script src="/js/client.js"></script>

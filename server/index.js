@@ -1,80 +1,63 @@
 const express = require('express');
-const fileUpload = require('express-fileupload');
+const bodyParser = require('body-parser');
+const multer = require('multer');
 const app = express();
-var Converter = require('ppt-png');
-var glob = require('glob');
 
-require('array-helpers');
+const Ppt = require('./ppt.js');
+const Websocket = require('./websocket.js');
 
-app.use(fileUpload());
+const storage = multer.diskStorage({
+    destination: function(req, file, callback) {
+        callback(null, './upload');
+    },
+    filename: function(req, file, callback) {
+        callback(null, file.fieldname + '-' + Date.now());
+    }
+});
+
+const upload = multer({
+    storage: storage
+}).array('ppt', 2);
+
+const httpPort = 3000;
+const socketPort = 3001;
+
+let uploads = 0;
+const io = new Websocket(app, socketPort, uploads);
+const pptpng = new Ppt(io, uploads);
+
+app.use(bodyParser.json());
 
 app.post('/upload', function(req, res) {
-    if (!req.files || !req.files.ppt) {
-        return res.status(400).send('No files were uploaded.');
-    }
-
-  // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-    let ppt = req.files.ppt;
-    let invert = false;
-    let greyscale = false;
-
-    if(req.body) {
-        invert = req.body.invert || false;
-        greyscale = req.body.greyscale || false;
-    }
-
-  // Use the mv() method to place the file somewhere on your server
-    ppt.mv('upload/tmp.ppt', function(err) {
-        if (err) {
-            return res.status(500).send(err);
+    upload(req, res, function(err) {
+        if(err) {
+            return res.end('Error uploading file.');
         }
 
-        res.send('File uploaded!');
+        let ppt = req.files;
+        let invert = false;
+        let greyscale = false;
+
+        if (!ppt || ppt.length < 1) {
+            return res.status(400).send('No files were uploaded.');
+        }
+
+        if(req.body) {
+            invert = req.body.invert || false;
+            greyscale = req.body.greyscale || false;
+        }
+
+        pptpng.process(req.files, invert, greyscale);
+
+        res.end('<result>File is uploaded</result>');
     });
 
-    process(invert, greyscale);
+    uploads++;
 });
 
 app.use(express.static('public'));
+app.use('/converted', express.static('converted'));
 
-app.listen(3000, function() {
-    console.log('Example app listening on port 3000!');
+app.listen(httpPort, function() {
+    console.log('Example app listening on port ' + httpPort + '!');
 });
-
-/**
- * Process the ppt.
- *
- * @param {boolean} invert
- * @param {boolean} greyscale
- */
-function process(invert, greyscale) {
-    console.log('invert:' + invert + '|greyscale:' + greyscale);
-    glob('upload/tmp.ppt', {}, convert);
-
-    /**
-     * Convert the ppt to png.
-     *
-     * @param {object} error
-     * @param {array} files
-     */
-    function convert(error, files) {
-        console.log('files: ', files.length);
-        if(files) {
-            new Converter({
-                files:          files,
-                output:         'converted/',
-                invert:         invert || false,
-                greyscale:      greyscale || false,
-                deletePdfFile:  true,
-                outputType:     'png',
-                logLevel:       2,
-                fileNameFormat: '_vers_%d'
-            }).wait().then(function(data) {
-                console.log(data.failed, data.success.length, data.files.length, data.time);
-                if(data.failed.length > 0) {
-                    convert(null, data.failed.multikey('file'));
-                }
-            });
-        }
-    }
-}
