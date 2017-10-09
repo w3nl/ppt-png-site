@@ -32,7 +32,9 @@ app.use(bodyParser.json());
 app.post('/upload', function(req, res) {
     upload(req, res, function(err) {
         if(err) {
-            return res.end('Error uploading file.');
+            return res.json({
+                status: 'Error uploading file.'
+            });
         }
 
         const pptpng = new Ppt(io, uploads);
@@ -42,7 +44,9 @@ app.post('/upload', function(req, res) {
         let greyscale = false;
 
         if (!ppt || ppt.length < 1) {
-            return res.status(400).send('No files were uploaded.');
+            return res.json({
+                status: 'No files were uploaded.'
+            });
         }
 
         if(req.body) {
@@ -52,7 +56,9 @@ app.post('/upload', function(req, res) {
 
         pptpng.process(req.files, invert, greyscale);
 
-        res.end('File is uploaded');
+        res.json({
+            status: 'File is uploaded'
+        });
     });
 
     uploads++;

@@ -32,11 +32,12 @@ function upload() {
     $('.js-status').empty().text('File is uploading...');
 
     $(this).ajaxSubmit({
-        error: function(xhr) {
+        dataType: 'json',
+        error:    function(xhr) {
             status('Error: ' + xhr.status);
         },
         success: function(response) {
-            $('.js-status').empty().text(response);
+            $('.js-status').empty().text(response.status);
         }
     });
 
