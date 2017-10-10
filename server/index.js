@@ -8,10 +8,10 @@ const Websocket = require('./websocket.js');
 
 let fileUploads = 0;
 const storage = multer.diskStorage({
-    destination: function(req, file, callback) {
+    destination: (req, file, callback) => {
         callback(null, './upload');
     },
-    filename: function(req, file, callback) {
+    filename: (req, file, callback) => {
         callback(null, file.fieldname + '-' + fileUploads + '-' + Date.now());
         fileUploads++;
     }
@@ -29,8 +29,8 @@ const io = new Websocket(app, socketPort, uploads);
 
 app.use(bodyParser.json());
 
-app.post('/upload', function(req, res) {
-    upload(req, res, function(err) {
+app.post('/upload', (req, res) => {
+    upload(req, res, (err) => {
         if(err) {
             return res.json({
                 status: 'Error uploading file.'
@@ -67,6 +67,4 @@ app.post('/upload', function(req, res) {
 app.use(express.static('public'));
 app.use('/converted', express.static('converted'));
 
-app.listen(httpPort, function() {
-    console.log('Example app listening on port ' + httpPort + '!');
-});
+app.listen(httpPort);
