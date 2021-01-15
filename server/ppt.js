@@ -1,5 +1,7 @@
 const filessystem = require('fs');
-const Ppt2PngConverter = require('ppt-png');
+const {
+    Ppt2PngConverter
+} = require('ppt-png');
 
 /**
  * ppt processor.
@@ -40,7 +42,7 @@ class ppt {
             }
 
             const converter = Ppt2PngConverter.create({
-                files:          files,
+                files:          files.map(file => file.path),
                 output:         outputDirectory,
                 invert:         invert || false,
                 greyscale:      greyscale || false,
