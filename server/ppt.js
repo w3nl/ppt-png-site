@@ -1,5 +1,5 @@
 const filessystem = require('fs');
-const Converter = require('ppt-png');
+const Ppt2PngConverter = require('ppt-png');
 
 /**
  * ppt processor.
@@ -39,7 +39,7 @@ class ppt {
                 filessystem.mkdirSync(outputDirectory);
             }
 
-            new Converter({
+            const converter = Ppt2PngConverter.create({
                 files:          files,
                 output:         outputDirectory,
                 invert:         invert || false,
@@ -48,7 +48,12 @@ class ppt {
                 outputType:     'png',
                 logLevel:       2,
                 fileNameFormat: '_vers_%d'
-            }).wait().then(this.update.bind(this));
+            });
+
+
+            const result = converter.convert();
+
+            this.update(result);
         }
     }
 
@@ -58,7 +63,10 @@ class ppt {
      * @param {object} data
      */
     update(data) {
-        console.log(data.failed, data.success.length, data.files.length, data.time);
+        console.log({
+            data
+        });
+        // console.log(data.failed, data.success.length, data.files.length, data.time);
         this.io.update(data, this.uploads);
     }
 }
