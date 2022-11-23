@@ -28,7 +28,7 @@
     "express": "^4.17.1",
     "multer": "^1.4.2",
     "ppt-png": "^1.1.8",
-    "socket.io": "^2.4.1"
+    "socket.io": "^2.5.0"
   },
   "engines": {
     "node": ">= 6.0"
